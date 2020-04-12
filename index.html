@@ -41,6 +41,8 @@
       <button onclick="resetField()" title="Shortcut: Escape">Reset</button>
       <button onclick="updateCycle()" title="Shortcut: Right arrow">Next Generation</button>
       <button onclick="toggleAnimation()" title="Shortcut: Space">Play/Pause</button>
+
+      Current Generation: <span id="generationCounter">0</span>
     </div>
     <div id="game"></div>
     <script>
@@ -129,7 +131,10 @@
     function resetField() {
       document.playing = false;
       document.currentField = document.startingField;
+      document.currentGeneration = 0;
+
       renderField(document.currentField);
+      generationCounter.textContent = document.currentGeneration;
     }
 
     function toggleAnimation() {
@@ -166,7 +171,10 @@
     function updateCycle() {
       let updateResult = advanceGeneration(document.currentField);
       document.currentField = updateResult.field;
+      document.currentGeneration++;
+
       renderChanges(updateResult.changes);
+      generationCounter.textContent = document.currentGeneration;
     }
 
     document.startingField = initializeField();
@@ -177,9 +185,7 @@
     document.startingField[10][12] = true;
     document.startingField[11][12] = true;
 
-    document.currentField = document.startingField;
-
-    renderField(document.currentField);
+    resetField();
 
     setInterval(() => { if(document.playing) updateCycle() }, 100);
     document.getElementById("game").addEventListener("click", fieldClicked);
