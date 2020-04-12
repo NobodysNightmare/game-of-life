@@ -75,21 +75,42 @@
       }
     }
 
+    function renderChanges(changes) {
+      let domField = document.getElementById("game");
+
+      for(let change of changes) {
+        let domCell = domField.querySelector(`[data-x="${change.x}"][data-y="${change.y}"]`);
+        if(change.alive) {
+          domCell.classList.add("alive");
+        } else {
+          domCell.classList.remove("alive");
+        }
+      }
+    }
+
     function advanceGeneration(currentGeneration) {
       let nextGeneration = initializeField();
+      let changes = [];
 
       for(let y = 0; y < height; y++) {
         for(let x = 0; x < width; x++) {
             let neighbours = neighbourCount(currentGeneration, x, y);
             if(currentGeneration[x][y]) {
-              if(neighbours === 2 || neighbours === 3) nextGeneration[x][y] = true;
+              if(neighbours === 2 || neighbours === 3) {
+                nextGeneration[x][y] = true;
+              } else {
+                changes.push({ x: x, y: y, alive: false });
+              }
             } else {
-              if(neighbours === 3) nextGeneration[x][y] = true;
+              if(neighbours === 3) {
+                nextGeneration[x][y] = true;
+                changes.push({ x: x, y: y, alive: true });
+              }
             }
         }
       }
 
-      return nextGeneration;
+      return { field: nextGeneration, changes: changes };
     }
 
     function neighbourCount(field, x, y) {
@@ -143,8 +164,9 @@
     }
 
     function updateCycle() {
-      document.currentField = advanceGeneration(document.currentField);
-      renderField(document.currentField);
+      let updateResult = advanceGeneration(document.currentField);
+      document.currentField = updateResult.field;
+      renderChanges(updateResult.changes);
     }
 
     document.startingField = initializeField();
