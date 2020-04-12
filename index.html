@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Game of Life</title>
+    <style>
+    .cell {
+      border: 1px solid black;
+      height: 1em;
+      width: 1em;
+      display: inline-block;
+    }
+
+    .row {
+      margin: 0;
+      height: 1em;
+    }
+
+    .alive {
+      background-color: black;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button onclick="resetButtonClicked()">Reset</button>
+      <button onclick="nextButtonClicked()">Next Generation</button>
+      <button onclick="playPauseButtonClicked()">Play/Pause</button>
+    </div>
+    <div id="game"></div>
+    <script>
+    const width = 100;
+    const height = 100;
+
+    function initializeField() {
+      let field = Array(width);
+      for(let x = 0; x < width; x++) field[x] = Array(height).fill(false);
+
+      return field;
+    }
+
+    function renderField(field) {
+      let domField = document.getElementById("game");
+      domField.textContent = "";
+
+      for(let y = 0; y < height; y++) {
+        let domRow = document.createElement("div");
+        domRow.classList.add("row");
+
+        for(let x = 0; x < width; x++) {
+            let domCell = document.createElement("div");
+            domCell.classList.add("cell");
+            if(field[x][y]) domCell.classList.add("alive");
+            domCell.dataset.x = x;
+            domCell.dataset.y = y;
+            domRow.appendChild(domCell);
+        }
+
+        domField.appendChild(domRow);
+      }
+    }
+
+    function advanceGeneration(currentGeneration) {
+      let nextGeneration = initializeField();
+
+      for(let y = 0; y < height; y++) {
+        for(let x = 0; x < width; x++) {
+            let neighbours = neighbourCount(currentGeneration, x, y);
+            if(currentGeneration[x][y]) {
+              if(neighbours === 2 || neighbours === 3) nextGeneration[x][y] = true;
+            } else {
+              if(neighbours === 3) nextGeneration[x][y] = true;
+            }
+        }
+      }
+
+      return nextGeneration;
+    }
+
+    function neighbourCount(field, x, y) {
+      let count = 0;
+      for(let dy = -1; dy <= 1; dy++) {
+        for(let dx = -1; dx <= 1; dx++) {
+            if(dx === 0 && dy === 0) continue;
+            if(!field[x + dx]) continue;
+            if(field[x + dx][y + dy]) count++;
+        }
+      }
+
+      return count;
+    }
+
+    function resetButtonClicked() {
+      document.playing = false;
+      document.currentField = document.startingField;
+      renderField(document.currentField);
+    }
+
+    function nextButtonClicked() {
+      updateCycle();
+    }
+
+    function playPauseButtonClicked() {
+      document.playing = !document.playing;
+    }
+
+    function fieldClicked(event) {
+      let x = event.target.dataset.x;
+      let y = event.target.dataset.y;
+
+      console.log(`Clicked ${x};${y}`);
+
+      document.startingField[x][y] = !document.startingField[x][y];
+      resetButtonClicked();
+    }
+
+    function updateCycle() {
+      document.currentField = advanceGeneration(document.currentField);
+      renderField(document.currentField);
+    }
+
+    document.startingField = initializeField();
+
+    document.startingField[10][10] = true;
+    document.startingField[11][11] = true;
+    document.startingField[9][12] = true;
+    document.startingField[10][12] = true;
+    document.startingField[11][12] = true;
+
+    document.currentField = document.startingField;
+
+    renderField(document.currentField);
+
+    setInterval(() => { if(document.playing) updateCycle() }, 100);
+    document.getElementById("game").addEventListener("click", fieldClicked);
+    </script>
+  </body>
+</html>
