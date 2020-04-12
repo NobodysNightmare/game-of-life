@@ -38,9 +38,9 @@
   </head>
   <body>
     <div class="controls">
-      <button onclick="resetButtonClicked()">Reset</button>
-      <button onclick="nextButtonClicked()">Next Generation</button>
-      <button onclick="playPauseButtonClicked()">Play/Pause</button>
+      <button onclick="resetField()" title="Shortcut: Escape">Reset</button>
+      <button onclick="updateCycle()" title="Shortcut: Right arrow">Next Generation</button>
+      <button onclick="toggleAnimation()" title="Shortcut: Space">Play/Pause</button>
     </div>
     <div id="game"></div>
     <script>
@@ -105,17 +105,13 @@
       return count;
     }
 
-    function resetButtonClicked() {
+    function resetField() {
       document.playing = false;
       document.currentField = document.startingField;
       renderField(document.currentField);
     }
 
-    function nextButtonClicked() {
-      updateCycle();
-    }
-
-    function playPauseButtonClicked() {
+    function toggleAnimation() {
       document.playing = !document.playing;
     }
 
@@ -126,7 +122,24 @@
       console.log(`Clicked ${x};${y}`);
 
       document.startingField[x][y] = !document.startingField[x][y];
-      resetButtonClicked();
+      resetField();
+    }
+
+    function keyPressed(event) {
+      switch (event.key) {
+        case "Escape":
+          resetField();
+          event.preventDefault();
+          break;
+        case " ":
+          toggleAnimation();
+          event.preventDefault();
+          break;
+        case "ArrowRight":
+          updateCycle();
+          event.preventDefault();
+          break;
+      }
     }
 
     function updateCycle() {
@@ -148,6 +161,8 @@
 
     setInterval(() => { if(document.playing) updateCycle() }, 100);
     document.getElementById("game").addEventListener("click", fieldClicked);
+
+    document.addEventListener("keyup", keyPressed);
     </script>
   </body>
 </html>
