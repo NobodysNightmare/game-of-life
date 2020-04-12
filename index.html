@@ -3,6 +3,21 @@
   <head>
     <title>Game of Life</title>
     <style>
+    .controls {
+      height: 5em;
+    }
+
+    .controls button {
+      font-size: 1.5em;
+      margin: 1em 0.5em;
+    }
+
+    #game {
+      width: 95vw;
+      height: calc(100vh - 6em);
+      overflow: scroll;
+    }
+
     .cell {
       border: 1px solid black;
       height: 1em;
@@ -11,6 +26,7 @@
     }
 
     .row {
+      white-space: nowrap;
       margin: 0;
       height: 1em;
     }
